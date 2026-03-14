@@ -205,7 +205,7 @@ h3 { font-size: 1.2rem; }
 }
 .hero-est-badge {
   position: absolute;
-  bottom: -18px;
+  bottom: -50px;
   right: -18px;
   background: var(--gold);
   color: var(--navy-dark);
@@ -318,7 +318,7 @@ h3 { font-size: 1.2rem; }
 .hero-tagline { color: rgba(255,255,255,0.65); font-size: clamp(0.9rem, 1.8vw, 1.05rem); margin-bottom: 0; letter-spacing: 0.03em; }
 .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
 .hero-scroll-hint {
-  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  position: absolute; bottom: -1rem; left: 50%; transform: translateX(-50%);
   display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
   color: rgba(255,255,255,0.4); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
 }
@@ -894,7 +894,7 @@ h3 { font-size: 1.2rem; }
   .first-lady-card { flex-direction: column; text-align: center; }
   .footer-top { grid-template-columns: 1fr; padding: 2rem 1.5rem; }
   .hero-logo-full { width: 240px; }
-  .hero-est-badge { font-size: 0.85rem; bottom: -14px; right: -12px; }
+  .hero-est-badge { font-size: 0.85rem; bottom: -50px; right: -12px; }
   .hero-logo-panel { padding-bottom: 2rem; }
 
   /* Hide large cross watermarks on mobile — too prominent at small viewport widths */
