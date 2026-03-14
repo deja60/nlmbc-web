@@ -895,6 +895,11 @@ h3 { font-size: 1.2rem; }
   .footer-top { grid-template-columns: 1fr; padding: 2rem 1.5rem; }
   .hero-logo-full { width: 240px; }
   .hero-est-badge { font-size: 0.85rem; bottom: -14px; right: -12px; }
+  .hero-logo-panel { padding-bottom: 2rem; }
+
+  /* Hide large cross watermarks on mobile — too prominent at small viewport widths */
+  .hero::after { display: none; }
+  .page-hero::after { display: none; }
 }
 
 @media (max-width: 480px) {
