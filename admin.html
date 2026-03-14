@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Announcements Admin — NLMBC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:      #1a2744;
+      --navy-dark: #0d1526;
+      --gold:      #c9a84c;
+      --gold-light:#e8c97a;
+      --cream:     #f9f6f0;
+      --white:     #ffffff;
+      --text:      #2c3047;
+      --text-light:#6b7280;
+      --red:       #c0392b;
+      --green:     #27ae60;
+      --radius:    10px;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ---- PASSWORD GATE ---- */
+    #gate {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--navy-dark), #1e3460);
+    }
+    .gate-box {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    }
+    .gate-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.25rem;
+    }
+    .gate-sub {
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+    .gate-box h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--navy);
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+    }
+    .gate-box input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1.5px solid #dde1ea;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .gate-box input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.15); }
+    .gate-error {
+      color: var(--red);
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+      min-height: 1.2em;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-primary { background: var(--gold); color: var(--navy-dark); border-color: var(--gold); }
+    .btn-primary:hover { background: var(--gold-light); }
+    .btn-secondary { background: transparent; color: var(--navy); border-color: var(--navy); }
+    .btn-secondary:hover { background: var(--navy); color: var(--white); }
+    .btn-danger { background: transparent; color: var(--red); border-color: var(--red); font-size: 0.8rem; padding: 0.4rem 0.9rem; }
+    .btn-danger:hover { background: var(--red); color: var(--white); }
+    .btn-sm { font-size: 0.8rem; padding: 0.4rem 0.9rem; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* ---- ADMIN PANEL ---- */
+    #admin { display: none; }
+
+    .admin-header {
+      background: var(--navy-dark);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .admin-header-brand {
+      display: flex;
+      flex-direction: column;
+    }
+    .admin-header-brand span:first-child {
+      font-family: 'Playfair Display', serif;
+      color: var(--white);
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .admin-header-brand span:last-child {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .admin-header-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+    .admin-header a { color: rgba(255,255,255,0.6); font-size: 0.82rem; text-decoration: none; transition: color 0.2s; }
+    .admin-header a:hover { color: var(--gold); }
+
+    .admin-body {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    /* ---- ADD / EDIT FORM ---- */
+    #form-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border-top: 4px solid var(--gold);
+      display: none;
+    }
+    #form-section.open { display: block; }
+    #form-section h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--navy);
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--navy);
+      letter-spacing: 0.03em;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 0.7rem 0.9rem;
+      border: 1.5px solid #dde1ea;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      color: var(--text);
+      background: var(--white);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* ---- ANNOUNCEMENT LIST ---- */
+    .list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .list-header h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--navy);
+      font-size: 1.4rem;
+    }
+    .list-meta { font-size: 0.82rem; color: var(--text-light); }
+
+    .ann-list { display: flex; flex-direction: column; gap: 1rem; }
+
+    .ann-row {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border-left: 4px solid transparent;
+      transition: box-shadow 0.2s;
+    }
+    .ann-row:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); }
+    .ann-row.active { border-left-color: var(--gold); }
+    .ann-row.inactive { border-left-color: #dde1ea; opacity: 0.65; }
+    .ann-row.urgent { border-left-color: var(--red); }
+
+    .ann-row-info { min-width: 0; }
+    .ann-row-top {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.35rem;
+    }
+    .ann-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.65rem;
+      border-radius: 50px;
+    }
+    .ann-badge--navy   { background: rgba(26,39,68,0.1);  color: var(--navy); }
+    .ann-badge--gold   { background: rgba(201,168,76,0.15); color: #8a6e20; }
+    .ann-badge--urgent { background: rgba(192,57,43,0.12);  color: var(--red); }
+
+    .ann-row-status {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.55rem;
+      border-radius: 50px;
+    }
+    .status-active   { background: rgba(39,174,96,0.12);  color: var(--green); }
+    .status-inactive { background: rgba(0,0,0,0.07);      color: var(--text-light); }
+
+    .ann-row-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--navy);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ann-row-body {
+      font-size: 0.82rem;
+      color: var(--text-light);
+      margin-top: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ann-row-date {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    .ann-row-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .toggle-btn {
+      font-size: 0.78rem;
+      padding: 0.38rem 0.9rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      border: 1.5px solid;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .toggle-btn.hide-btn { color: var(--text-light); border-color: #dde1ea; background: transparent; }
+    .toggle-btn.hide-btn:hover { background: #f0f0f0; }
+    .toggle-btn.show-btn { color: var(--green); border-color: var(--green); background: transparent; }
+    .toggle-btn.show-btn:hover { background: var(--green); color: var(--white); }
+
+    .edit-btn {
+      font-size: 0.78rem;
+      padding: 0.38rem 0.9rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      border: 1.5px solid var(--navy);
+      color: var(--navy);
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .edit-btn:hover { background: var(--navy); color: var(--white); }
+
+    .delete-btn {
+      font-size: 0.78rem;
+      padding: 0.38rem 0.9rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      border: 1.5px solid var(--red);
+      color: var(--red);
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .delete-btn:hover { background: var(--red); color: var(--white); }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--text-light);
+      background: var(--white);
+      border-radius: var(--radius);
+    }
+    .empty-state p { margin-top: 0.5rem; font-size: 0.9rem; }
+
+    /* ---- IMPORT/EXPORT ---- */
+    .io-section {
+      margin-top: 2.5rem;
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 1.5rem 2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .io-section h3 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--cream);
+      padding-bottom: 0.5rem;
+    }
+    .io-row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+    .io-row input[type="file"] {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .ann-row { grid-template-columns: 1fr; }
+      .ann-row-actions { justify-content: flex-start; }
+      .admin-header { padding: 1rem; }
+      .admin-body { padding: 1.5rem 1rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     PASSWORD GATE
+     To change the password: edit ADMIN_PASSWORD below.
+     ============================================================ -->
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-logo">New Light MBC</div>
+    <div class="gate-sub">Admin Portal</div>
+    <h2>Sign In to Continue</h2>
+    <input type="password" id="pw-input" placeholder="Enter admin password" autocomplete="current-password" />
+    <div class="gate-error" id="pw-error"></div>
+    <button class="btn btn-primary btn-full" onclick="login()">Sign In</button>
+    <p style="margin-top:1.5rem; font-size:0.78rem; color:var(--text-light)">
+      <a href="index.html" style="color:var(--gold)">← Back to site</a>
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     ADMIN PANEL
+     ============================================================ -->
+<div id="admin">
+
+  <header class="admin-header">
+    <div class="admin-header-brand">
+      <span>New Light MBC</span>
+      <span>Announcements Admin</span>
+    </div>
+    <div class="admin-header-actions">
+      <a href="index.html" target="_blank">View Site ↗</a>
+      <button class="btn btn-primary btn-sm" onclick="openForm()">+ Add Announcement</button>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2)" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="admin-body">
+
+    <!-- ADD / EDIT FORM -->
+    <section id="form-section">
+      <h2 id="form-title">Add New Announcement</h2>
+      <form id="ann-form" onsubmit="saveAnn(event)">
+        <input type="hidden" id="f-id" value="" />
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="f-title">Title <span style="color:var(--gold)">*</span></label>
+            <input type="text" id="f-title" placeholder="Announcement title" required />
+          </div>
+          <div class="form-group full">
+            <label for="f-body">Details <span style="color:var(--gold)">*</span></label>
+            <textarea id="f-body" placeholder="Full announcement text…" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="f-category">Category</label>
+            <select id="f-category">
+              <option value="general">Announcement (General)</option>
+              <option value="event">Upcoming Event</option>
+              <option value="worship">Worship</option>
+              <option value="prayer">Prayer</option>
+              <option value="urgent">Urgent / Important</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="f-date">Date</label>
+            <input type="date" id="f-date" />
+          </div>
+          <div class="form-group">
+            <label for="f-link">Button Link (optional)</label>
+            <input type="text" id="f-link" placeholder="e.g. services.html or https://…" />
+          </div>
+          <div class="form-group">
+            <label for="f-linktext">Button Label (optional)</label>
+            <input type="text" id="f-linktext" placeholder="e.g. Learn More" />
+          </div>
+          <div class="form-group">
+            <label for="f-active">Visibility</label>
+            <select id="f-active">
+              <option value="true">Published — visible on site</option>
+              <option value="false">Hidden — not visible on site</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save Announcement</button>
+          <button type="button" class="btn btn-secondary" onclick="closeForm()">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ANNOUNCEMENT LIST -->
+    <div class="list-header">
+      <div>
+        <h2>All Announcements</h2>
+        <p class="list-meta" id="list-meta"></p>
+      </div>
+    </div>
+
+    <div class="ann-list" id="ann-list"></div>
+
+    <!-- IMPORT / EXPORT -->
+    <div class="io-section">
+      <h3>Backup &amp; Restore</h3>
+      <div class="io-row">
+        <button class="btn btn-secondary btn-sm" onclick="exportJSON()">⬇ Export JSON</button>
+        <label class="btn btn-secondary btn-sm" style="cursor:pointer">
+          ⬆ Import JSON
+          <input type="file" accept=".json" style="display:none" onchange="importJSON(event)" />
+        </label>
+        <span style="font-size:0.78rem; color:var(--text-light)">Use Export/Import to back up or transfer announcements between devices.</span>
+      </div>
+    </div>
+
+  </div><!-- /admin-body -->
+</div><!-- /admin -->
+
+<script>
+// ============================================================
+//  Configuration — change the password here
+// ============================================================
+const ADMIN_PASSWORD = 'nlmbc2025';
+const ANN_KEY        = 'nlmbc_announcements';
+const AUTH_KEY       = 'nlmbc_admin_auth';
+
+// ---- Data helpers ----
+const DEFAULT_ANNOUNCEMENTS = [
+  {
+    id: 1,
+    title: 'Welcome to New Light Missionary Baptist Church',
+    body: 'We are so glad you are here. Whether joining us in person or online, you are warmly welcomed. Stop by the Welcome Center after service — we would love to meet you!',
+    date: today(),
+    category: 'general',
+    link: 'new-visitor.html',
+    linkText: 'Plan Your Visit',
+    active: true
+  },
+  {
+    id: 2,
+    title: 'MidWeek Manna — Wednesday Bible Study',
+    body: 'Join us every Wednesday at 12:00 PM and 7:00 PM for MidWeek Manna worship and Bible Study in the Sanctuary. All are welcome.',
+    date: today(),
+    category: 'worship',
+    link: 'services.html',
+    linkText: 'Service Details',
+    active: true
+  }
+];
+
+function today() { return new Date().toISOString().slice(0, 10); }
+
+function getAll() {
+  try {
+    const s = localStorage.getItem(ANN_KEY);
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return DEFAULT_ANNOUNCEMENTS;
+}
+function setAll(list) { localStorage.setItem(ANN_KEY, JSON.stringify(list)); }
+
+// ---- Category labels ----
+const CAT_META = {
+  general: { label: 'Announcement',   color: 'navy'   },
+  event:   { label: 'Upcoming Event', color: 'gold'   },
+  urgent:  { label: 'Urgent',         color: 'urgent' },
+  worship: { label: 'Worship',        color: 'navy'   },
+  prayer:  { label: 'Prayer',         color: 'navy'   },
+};
+function catMeta(c) { return CAT_META[c] || CAT_META.general; }
+
+function formatDate(d) {
+  if (!d) return '';
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function esc(s) {
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ---- Render list ----
+function renderList() {
+  const list = getAll();
+  const el   = document.getElementById('ann-list');
+  const meta = document.getElementById('list-meta');
+  const active = list.filter(a => a.active).length;
+  meta.textContent = `${list.length} total · ${active} published · ${list.length - active} hidden`;
+
+  if (list.length === 0) {
+    el.innerHTML = `<div class="empty-state">
+      <strong style="font-size:1.1rem;color:var(--navy)">No announcements yet</strong>
+      <p>Click "+ Add Announcement" above to create your first one.</p>
+    </div>`;
+    return;
+  }
+
+  // Sort newest first
+  const sorted = [...list].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  el.innerHTML = sorted.map(ann => {
+    const m = catMeta(ann.category);
+    const statusClass = ann.active ? 'status-active' : 'status-inactive';
+    const statusLabel = ann.active ? 'Published' : 'Hidden';
+    const rowClass    = ann.category === 'urgent' ? 'urgent' : (ann.active ? 'active' : 'inactive');
+    return `
+      <div class="ann-row ${rowClass}" id="row-${ann.id}">
+        <div class="ann-row-info">
+          <div class="ann-row-top">
+            <span class="ann-badge ann-badge--${m.color}">${m.label}</span>
+            <span class="ann-row-status ${statusClass}">${statusLabel}</span>
+            <span class="ann-row-date">${formatDate(ann.date)}</span>
+          </div>
+          <div class="ann-row-title">${esc(ann.title)}</div>
+          <div class="ann-row-body">${esc(ann.body)}</div>
+        </div>
+        <div class="ann-row-actions">
+          <button class="toggle-btn ${ann.active ? 'hide-btn' : 'show-btn'}"
+            onclick="toggleActive(${ann.id})">
+            ${ann.active ? 'Hide' : 'Publish'}
+          </button>
+          <button class="edit-btn" onclick="editAnn(${ann.id})">Edit</button>
+          <button class="delete-btn" onclick="deleteAnn(${ann.id})">Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ---- Form ----
+function setTodayDate() {
+  document.getElementById('f-date').value = today();
+}
+
+function openForm() {
+  document.getElementById('form-title').textContent = 'Add New Announcement';
+  document.getElementById('f-id').value      = '';
+  document.getElementById('f-title').value   = '';
+  document.getElementById('f-body').value    = '';
+  document.getElementById('f-category').value = 'general';
+  document.getElementById('f-date').value    = today();
+  document.getElementById('f-link').value    = '';
+  document.getElementById('f-linktext').value = '';
+  document.getElementById('f-active').value  = 'true';
+  const fs = document.getElementById('form-section');
+  fs.classList.add('open');
+  fs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('f-title').focus();
+}
+
+function closeForm() {
+  document.getElementById('form-section').classList.remove('open');
+}
+
+function editAnn(id) {
+  const list = getAll();
+  const ann  = list.find(a => a.id === id);
+  if (!ann) return;
+  document.getElementById('form-title').textContent = 'Edit Announcement';
+  document.getElementById('f-id').value       = ann.id;
+  document.getElementById('f-title').value    = ann.title;
+  document.getElementById('f-body').value     = ann.body;
+  document.getElementById('f-category').value = ann.category || 'general';
+  document.getElementById('f-date').value     = ann.date || today();
+  document.getElementById('f-link').value     = ann.link || '';
+  document.getElementById('f-linktext').value = ann.linkText || '';
+  document.getElementById('f-active').value   = ann.active ? 'true' : 'false';
+  const fs = document.getElementById('form-section');
+  fs.classList.add('open');
+  fs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('f-title').focus();
+}
+
+function saveAnn(e) {
+  e.preventDefault();
+  const list = getAll();
+  const idVal = document.getElementById('f-id').value;
+  const ann = {
+    id:       idVal ? parseInt(idVal) : Date.now(),
+    title:    document.getElementById('f-title').value.trim(),
+    body:     document.getElementById('f-body').value.trim(),
+    category: document.getElementById('f-category').value,
+    date:     document.getElementById('f-date').value || today(),
+    link:     document.getElementById('f-link').value.trim(),
+    linkText: document.getElementById('f-linktext').value.trim(),
+    active:   document.getElementById('f-active').value === 'true',
+  };
+  if (idVal) {
+    const idx = list.findIndex(a => a.id === ann.id);
+    if (idx > -1) list[idx] = ann; else list.push(ann);
+  } else {
+    list.push(ann);
+  }
+  setAll(list);
+  closeForm();
+  renderList();
+  // Flash confirmation
+  showToast(idVal ? 'Announcement updated.' : 'Announcement added!');
+}
+
+// ---- Toggle / Delete ----
+function toggleActive(id) {
+  const list = getAll();
+  const ann  = list.find(a => a.id === id);
+  if (!ann) return;
+  ann.active = !ann.active;
+  setAll(list);
+  renderList();
+  showToast(ann.active ? 'Announcement published.' : 'Announcement hidden.');
+}
+
+function deleteAnn(id) {
+  if (!confirm('Delete this announcement? This cannot be undone.')) return;
+  const list = getAll().filter(a => a.id !== id);
+  setAll(list);
+  renderList();
+  showToast('Announcement deleted.');
+}
+
+// ---- Export / Import ----
+function exportJSON() {
+  const data    = JSON.stringify(getAll(), null, 2);
+  const blob    = new Blob([data], { type: 'application/json' });
+  const url     = URL.createObjectURL(blob);
+  const a       = document.createElement('a');
+  a.href        = url;
+  a.download    = `nlmbc-announcements-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error('Not an array');
+      if (confirm(`Import ${data.length} announcements? This will replace all current announcements.`)) {
+        setAll(data);
+        renderList();
+        showToast(`Imported ${data.length} announcements.`);
+      }
+    } catch(err) {
+      alert('Invalid file. Please export from this admin page and use that file.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ---- Toast notification ----
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {
+    position: 'fixed', bottom: '2rem', right: '2rem', zIndex: '9999',
+    background: 'var(--navy-dark)', color: '#fff',
+    padding: '0.75rem 1.5rem', borderRadius: '50px',
+    fontSize: '0.88rem', fontWeight: '600',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+    transition: 'opacity 0.4s',
+    fontFamily: 'Inter, sans-serif',
+  });
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2500);
+}
+
+// ---- Auth functions ----
+function login() {
+  const val = document.getElementById('pw-input').value;
+  if (val === ADMIN_PASSWORD) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    document.getElementById('gate').style.display  = 'none';
+    document.getElementById('admin').style.display = 'block';
+    renderList();
+    setTodayDate();
+  } else {
+    document.getElementById('pw-error').textContent = 'Incorrect password. Please try again.';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+function logout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  location.reload();
+}
+
+// ---- Initialization (runs after all declarations above are ready) ----
+// Seed localStorage with defaults if empty
+if (!localStorage.getItem(ANN_KEY)) setAll(DEFAULT_ANNOUNCEMENTS);
+
+// Enter key on password field
+document.getElementById('pw-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') login();
+});
+
+// If already authenticated this session, skip the gate and render immediately
+if (sessionStorage.getItem(AUTH_KEY)) {
+  document.getElementById('gate').style.display  = 'none';
+  document.getElementById('admin').style.display = 'block';
+  renderList();
+  setTodayDate();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Light Missionary Baptist Church | Greensboro, NC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="site-header" id="site-header">
+    <nav class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="New Light Missionary Baptist Church" class="nav-logo-img" />
+        <span class="nav-brand-text">
+          <span class="nav-brand-name">New Light</span>
+          <span class="nav-brand-sub">Missionary Baptist Church</span>
+        </span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li class="has-dropdown">
+          <a href="about.html">About Us ▾</a>
+          <ul class="dropdown">
+            <li><a href="new-visitor.html">I Am New to NLMBC</a></li>
+            <li><a href="about.html#history">Our History</a></li>
+            <li><a href="about.html#mission">Mission</a></li>
+          </ul>
+        </li>
+        <li><a href="services.html">Worship</a></li>
+        <li><a href="leadership.html">Leadership</a></li>
+        <li><a href="media.html">Media</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.simplechurchgiving.net/app/giving/nlmbcgiving" target="_blank" rel="noopener" class="nav-give-btn">Give Online</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-split">
+      <!-- Left: Logo feature panel -->
+      <div class="hero-logo-panel">
+        <div class="hero-logo-badge">
+          <img src="logo.png" alt="New Light Missionary Baptist Church" class="hero-logo-full" />
+          <div class="hero-est-badge">Est. 1891</div>
+        </div>
+      </div>
+      <!-- Right: Content panel -->
+      <div class="hero-content-panel">
+        <p class="hero-eyebrow">Serving Greensboro for 131+ Years</p>
+        <h1 class="hero-title">New Light Missionary<br />Baptist Church</h1>
+        <p class="hero-tagline">Exalting the Savior &bull; Equipping the Saints &bull; Evangelizing the Sinners</p>
+        <div class="hero-service-preview">
+          <div class="hsp-item"><span class="hsp-day">Sunday</span><span class="hsp-time">7:30 &amp; 10:45 AM</span></div>
+          <div class="hsp-item"><span class="hsp-day">Wednesday</span><span class="hsp-time">12 PM &amp; 7 PM</span></div>
+          <div class="hsp-item"><span class="hsp-day">Prayer Line Thu</span><span class="hsp-time">8:00 PM</span></div>
+        </div>
+        <div class="hero-actions">
+          <a href="new-visitor.html" class="btn btn-primary">Plan Your Visit</a>
+          <a href="services.html" class="btn btn-outline">View Service Times</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- WELCOME BANNER -->
+  <section class="welcome-bar">
+    <div class="container welcome-inner">
+      <div class="welcome-text">
+        <p class="section-eyebrow">A Personal Invitation</p>
+        <h2 class="section-title">Welcome to New Light</h2>
+        <p>For over 131 years, New Light has been known for Exalting the Savior, Equipping the Saints, and Evangelizing the Sinners. We extend a personal invitation to you to worship with us at one of our morning worship opportunities — we look forward to seeing you at New Light!</p>
+        <a href="new-visitor.html" class="btn btn-primary" style="margin-top:1rem">I'm New Here</a>
+      </div>
+      <div class="welcome-verse-card">
+        <div class="cross-symbol">✝</div>
+        <blockquote>"For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."</blockquote>
+        <cite>— John 3:16</cite>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANNOUNCEMENTS -->
+  <section class="announcements-section" id="announcements-section">
+    <div class="container">
+      <div class="ann-section-header">
+        <div>
+          <p class="section-eyebrow">Stay Informed</p>
+          <h2 class="section-title">Announcements</h2>
+        </div>
+      </div>
+      <div class="ann-grid" id="announcements-list"></div>
+    </div>
+  </section>
+
+  <!-- SANCTUARY PHOTO STRIP -->
+  <div class="sanctuary-strip">
+    <img src="473784-R1-14-14_015_090_0901-1600x560.jpg" alt="New Light Missionary Baptist Church Sanctuary" class="sanctuary-strip-img" />
+    <div class="sanctuary-strip-overlay">
+      <div class="sanctuary-caption">
+        <span class="section-eyebrow">Our Home</span>
+        <h3>The New Light Sanctuary — Greensboro, NC</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICE TIMES -->
+  <section class="times-bar">
+    <div class="times-header container">
+      <p class="section-eyebrow center-text">Join Us</p>
+      <h2 class="section-title center-text">Worship With Us</h2>
+    </div>
+    <div class="times-grid container">
+      <div class="time-card">
+        <div class="time-icon">☀</div>
+        <div class="time-label">Sunday Morning</div>
+        <div class="time-value">7:30 AM &amp; 10:45 AM</div>
+        <div class="time-sub">Worship Service — Sanctuary</div>
+      </div>
+      <div class="time-card">
+        <div class="time-icon">📖</div>
+        <div class="time-label">Sunday School</div>
+        <div class="time-value">9:30 AM</div>
+        <div class="time-sub">Every Sunday</div>
+      </div>
+      <div class="time-card">
+        <div class="time-icon">✦</div>
+        <div class="time-label">Wednesday — MidWeek Manna</div>
+        <div class="time-value">12:00 PM &amp; 7:00 PM</div>
+        <div class="time-sub">Worship &amp; Bible Study — Sanctuary</div>
+      </div>
+      <div class="time-card time-card-live">
+        <div class="time-icon">☎</div>
+        <div class="time-label">Thursday Night Prayer Line</div>
+        <div class="time-value">8:00 PM</div>
+        <div class="time-sub">Call (712) 775-7031 · Code: 769-681-374#</div>
+      </div>
+    </div>
+    <div class="container center-text" style="margin-top:1.5rem">
+      <a href="services.html" class="btn btn-secondary">See All Services &amp; Programs</a>
+    </div>
+  </section>
+
+  <!-- QUICK LINKS -->
+  <section class="section quick-links-section">
+    <div class="container">
+      <div class="quick-grid">
+        <a href="new-visitor.html" class="quick-card">
+          <div class="quick-icon">👋</div>
+          <h3>New to NLMBC?</h3>
+          <p>Everything you need to know for your first visit — parking, childcare, what to expect.</p>
+          <span class="quick-link-text">Learn More →</span>
+        </a>
+        <a href="about.html#mission" class="quick-card">
+          <div class="quick-icon">✝</div>
+          <h3>Our Mission &amp; Beliefs</h3>
+          <p>We glorify God, know Christ, and make Christ known through ministry and evangelism.</p>
+          <span class="quick-link-text">Read More →</span>
+        </a>
+        <a href="media.html" class="quick-card">
+          <div class="quick-icon">▶</div>
+          <h3>Watch Online</h3>
+          <p>Can't join us in person? Stream our services live on YouTube and Facebook.</p>
+          <span class="quick-link-text">Watch Now →</span>
+        </a>
+        <a href="https://www.simplechurchgiving.net/app/giving/nlmbcgiving" target="_blank" rel="noopener" class="quick-card">
+          <div class="quick-icon">🙏</div>
+          <h3>Give Online</h3>
+          <p>Support the ministry of New Light MBC through our secure online giving portal.</p>
+          <span class="quick-link-text">Give Now →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASTOR HIGHLIGHT -->
+  <section class="section pastor-highlight-section">
+    <div class="container two-col">
+      <div class="pastor-hl-visual">
+        <div class="pastor-hl-photo">
+          <img src="pasterand1stlady.jpg" alt="Rev. Dr. Cardes H. Brown Jr. and First Lady" class="pastor-photo-img" />
+        </div>
+        <div class="pastor-hl-years">50+ Years<br/><small>of Pastoral Service</small></div>
+      </div>
+      <div class="pastor-hl-text">
+        <p class="section-eyebrow">Our Shepherd</p>
+        <h2 class="section-title">Rev. Dr. Cardes H. Brown, Jr.</h2>
+        <p class="pastor-title-label">Senior Pastor</p>
+        <p>Reverend Dr. Cardes H. Brown, Jr. is a true visionary and leader. At nineteen years of age, during his sophomore year at North Carolina A&T State University, he accepted the calling of God to preach the gospel of Jesus Christ.</p>
+        <p>For over fifty years, he has served as the Senior Pastor of New Light Missionary Baptist Church. Under his leadership, the membership tripled, the Family Life Center was built, and countless community outreach programs were launched.</p>
+        <a href="leadership.html" class="btn btn-primary">Meet Our Leadership</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE STREAM CTA -->
+  <section class="livestream-cta">
+    <div class="container livestream-inner">
+      <div class="livestream-text">
+        <p class="section-eyebrow light">Can't Join Us In Person?</p>
+        <h2 class="section-title light">Watch Live Online</h2>
+        <p>We broadcast our services live on YouTube and Facebook so you can worship from anywhere.</p>
+      </div>
+      <div class="livestream-btns">
+        <a href="http://sundaystreams.com/go/NLMBC" target="_blank" rel="noopener" class="btn btn-primary btn-lg">▶ Watch Live Stream</a>
+        <a href="https://www.youtube.com/channel/UC5Y4dRVFUz2XJPBI5qWHDgA" target="_blank" rel="noopener" class="btn btn-outline btn-lg">YouTube Channel</a>
+        <a href="https://www.facebook.com/pages/New-Light-Missionary-Baptist-Church-NLMBC/515124625273264" target="_blank" rel="noopener" class="btn btn-outline btn-lg">Facebook Live</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <!-- Logo brand bar — full width, centered -->
+      <div class="footer-brand-bar">
+        <div class="footer-brand">
+          <a href="index.html">
+            <img src="logo.png" alt="New Light Missionary Baptist Church" class="footer-logo-img" />
+          </a>
+        </div>
+        <p class="footer-tagline">Exalting the Savior &bull; Equipping the Saints &bull; Evangelizing the Sinners</p>
+        <p class="footer-est">Serving Greensboro, NC Since 1891</p>
+        <div class="social-links" style="margin-top:1.25rem; justify-content:center">
+          <a href="https://twitter.com/NLMBCGSO" target="_blank" rel="noopener" class="social-btn">Twitter / X</a>
+          <a href="https://www.facebook.com/pages/New-Light-Missionary-Baptist-Church-NLMBC/515124625273264" target="_blank" rel="noopener" class="social-btn">Facebook</a>
+          <a href="https://www.youtube.com/channel/UC5Y4dRVFUz2XJPBI5qWHDgA" target="_blank" rel="noopener" class="social-btn">YouTube</a>
+        </div>
+      </div>
+      <!-- Footer info grid -->
+      <div class="footer-top">
+        <div class="footer-brand-col" style="display:none"><!-- moved to brand bar --></div>
+        <div class="footer-links-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="new-visitor.html">New to NLMBC</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="services.html">Worship &amp; Services</a></li>
+            <li><a href="leadership.html">Our Leadership</a></li>
+            <li><a href="media.html">Media</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact-col">
+          <h4>Contact</h4>
+          <p>1105 Willow Road<br />Greensboro, NC 27401</p>
+          <p><a href="tel:3362735579">336.273.5579</a></p>
+          <p><a href="mailto:office@nlmbc.com">office@nlmbc.com</a></p>
+          <p style="margin-top:0.75rem"><strong>Office Hours</strong><br/>Mon–Fri, 9am–5pm</p>
+        </div>
+        <div class="footer-service-col">
+          <h4>Services</h4>
+          <p>Sunday: 7:30 AM &amp; 10:45 AM</p>
+          <p>Sunday School: 9:30 AM</p>
+          <p>Wednesday: 12 PM &amp; 7 PM</p>
+          <p>Prayer Line (Thu): 8:00 PM</p>
+          <p style="margin-top:0.75rem">
+            <a href="https://www.simplechurchgiving.net/app/giving/nlmbcgiving" target="_blank" rel="noopener" class="btn btn-primary" style="font-size:0.8rem;padding:0.5rem 1.25rem">Give Online</a>
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 New Light Missionary Baptist Church. All rights reserved.</p>
+        <p style="margin-top:0.5rem"><a href="admin.html" style="color:rgba(255,255,255,0.18);font-size:0.72rem;letter-spacing:0.06em">Staff Admin</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+  <script src="announcements.js"></script>
+</body>
+</html>
