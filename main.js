@@ -7,10 +7,13 @@ window.addEventListener('scroll', () => {
 // ===== Mobile nav toggle =====
 const toggle = document.getElementById('nav-toggle');
 const navLinks = document.getElementById('nav-links');
+toggle.setAttribute('aria-expanded', 'false');
+toggle.setAttribute('aria-controls', 'nav-links');
 
 function closeNav() {
   navLinks.classList.remove('open');
   toggle.classList.remove('active');
+  toggle.setAttribute('aria-expanded', 'false');
   const spans = toggle.querySelectorAll('span');
   spans[0].style.transform = '';
   spans[1].style.opacity = '';
@@ -21,6 +24,7 @@ toggle.addEventListener('click', (e) => {
   e.stopPropagation();
   const isOpen = navLinks.classList.toggle('open');
   toggle.classList.toggle('active', isOpen);
+  toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   const spans = toggle.querySelectorAll('span');
   if (isOpen) {
     spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
@@ -70,7 +74,9 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.querySelectorAll(fadeSelectors.join(',')).forEach((el, i) => {
+  if (prefersReducedMotion) return;
   el.style.opacity = '0';
   el.style.transform = 'translateY(20px)';
   el.style.transition = `opacity 0.5s ease ${(i % 4) * 0.08}s, transform 0.5s ease ${(i % 4) * 0.08}s`;

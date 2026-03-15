@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact Us | New Light Missionary Baptist Church</title>
+  <meta name="description" content="Contact New Light MBC in Greensboro, NC. 1105 Willow Road · 336.273.5579 · office@nlmbc.com · Office hours Mon–Fri 9am–5pm." />
+  <link rel="icon" href="logo.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -147,16 +149,16 @@
             <div class="form-row">
               <div class="form-group">
                 <label for="first-name">First Name <span class="req">*</span></label>
-                <input type="text" id="first-name" name="first_name" placeholder="Your first name" required />
+                <input type="text" id="first-name" name="first_name" placeholder="Your first name" required aria-required="true" />
               </div>
               <div class="form-group">
                 <label for="last-name">Last Name <span class="req">*</span></label>
-                <input type="text" id="last-name" name="last_name" placeholder="Your last name" required />
+                <input type="text" id="last-name" name="last_name" placeholder="Your last name" required aria-required="true" />
               </div>
             </div>
             <div class="form-group">
               <label for="email">Email Address <span class="req">*</span></label>
-              <input type="email" id="email" name="email" placeholder="your@email.com" required />
+              <input type="email" id="email" name="email" placeholder="your@email.com" required aria-required="true" />
             </div>
             <div class="form-group">
               <label for="phone">Phone Number</label>
@@ -177,12 +179,12 @@
             </div>
             <div class="form-group">
               <label for="message">Message <span class="req">*</span></label>
-              <textarea id="message" name="message" rows="5" placeholder="How can we help you?" required></textarea>
+              <textarea id="message" name="message" rows="5" placeholder="How can we help you?" required aria-required="true"></textarea>
             </div>
             <button type="submit" class="btn btn-primary btn-lg btn-full">Send Message</button>
             <p class="form-note">You can also email us directly at <a href="mailto:office@nlmbc.com">office@nlmbc.com</a></p>
           </form>
-          <div class="form-success" id="form-success" style="display:none">
+          <div class="form-success" id="form-success" style="display:none" aria-live="polite" aria-atomic="true">
             <div class="success-icon">✓</div>
             <h3>Message Sent!</h3>
             <p>Thank you for reaching out to New Light MBC. We'll get back to you within 1–2 business days. God bless you!</p>
@@ -234,7 +236,6 @@
       </div>
       <!-- Footer info grid -->
       <div class="footer-top">
-        <div class="footer-brand-col" style="display:none"><!-- moved to brand bar --></div>
         <div class="footer-links-col">
           <h4>Quick Links</h4>
           <ul>
@@ -256,12 +257,12 @@
           <h4>Services</h4>
           <p>Sunday: 9:00 AM</p>
           <p>Sunday School: 8:00 AM</p>
-          <p>Wednesday: 12 PM &amp; 7 PM</p>
-          <p>Prayer Line (Thu): 8:00 PM</p>
+          <p>Wednesday MidWeek Manna: 7:00 PM</p>
+          <p>Prayer Line (Thu): 7:00 PM</p>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2025 New Light Missionary Baptist Church. All rights reserved.</p>
+        <p>&copy; 2026 New Light Missionary Baptist Church. All rights reserved.</p>
       </div>
     </div>
   </footer>
