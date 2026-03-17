@@ -781,8 +781,22 @@ function moveDown(docId) {
 
 function swapOrder(a, b) {
   var batch = db.batch();
-  batch.update(db.collection('announcements').doc(a._id), { order: b.order });
-  batch.update(db.collection('announcements').doc(b._id), { order: a.order });
+  var needsInit = _currentList.some(function (d) { return d.order === undefined; });
+
+  if (needsInit) {
+    // Assign sequential order to every doc that lacks one, then swap
+    _currentList.forEach(function (doc, idx) { doc.order = idx * 10; });
+    var tmp = a.order; a.order = b.order; b.order = tmp;
+    _currentList.forEach(function (doc) {
+      batch.update(db.collection('announcements').doc(doc._id), { order: doc.order });
+    });
+  } else {
+    // All docs already have order — just swap the two
+    var tmp = a.order; a.order = b.order; b.order = tmp;
+    batch.update(db.collection('announcements').doc(a._id), { order: a.order });
+    batch.update(db.collection('announcements').doc(b._id), { order: b.order });
+  }
+
   batch.commit().then(renderList).catch(function (e) { alert('Error: ' + e.message); });
 }
 
