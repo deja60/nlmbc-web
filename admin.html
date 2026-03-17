@@ -670,7 +670,6 @@ function renderList() {
   el.innerHTML = '<p style="color:var(--text-light);padding:1rem">Loading…</p>';
 
   db.collection('announcements')
-    .orderBy('order', 'asc')
     .get()
     .then(function (snapshot) {
       var list = [];
@@ -678,6 +677,14 @@ function renderList() {
         var d = doc.data();
         d._id = doc.id;
         list.push(d);
+      });
+      list.sort(function (a, b) {
+        var ao = (a.order !== undefined) ? a.order : Infinity;
+        var bo = (b.order !== undefined) ? b.order : Infinity;
+        if (ao !== bo) return ao - bo;
+        var at = (a.createdAt && a.createdAt.seconds) ? a.createdAt.seconds : 0;
+        var bt = (b.createdAt && b.createdAt.seconds) ? b.createdAt.seconds : 0;
+        return bt - at;
       });
       _currentList = list;
 
@@ -858,9 +865,14 @@ function saveAnn(e) {
     // New — set createdAt and place at top of list (order = minOrder - 1)
     data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
     op = db.collection('announcements')
-      .orderBy('order', 'asc').limit(1).get()
+      .get()
       .then(function (snap) {
-        data.order = snap.empty ? 0 : (snap.docs[0].data().order - 1);
+        var minOrder = 0;
+        snap.forEach(function (doc) {
+          var o = doc.data().order;
+          if (o !== undefined && o < minOrder) minOrder = o;
+        });
+        data.order = snap.empty ? 0 : (minOrder - 1);
         return db.collection('announcements').add(data);
       });
   }

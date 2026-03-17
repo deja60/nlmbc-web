@@ -78,7 +78,6 @@
 
   function load() {
     db.collection('announcements')
-      .orderBy('order', 'asc')
       .get()
       .then(function (snapshot) {
         var docs = [];
@@ -86,6 +85,14 @@
           var d = doc.data();
           d._id = doc.id;
           docs.push(d);
+        });
+        docs.sort(function (a, b) {
+          var ao = (a.order !== undefined) ? a.order : Infinity;
+          var bo = (b.order !== undefined) ? b.order : Infinity;
+          if (ao !== bo) return ao - bo;
+          var at = (a.createdAt && a.createdAt.seconds) ? a.createdAt.seconds : 0;
+          var bt = (b.createdAt && b.createdAt.seconds) ? b.createdAt.seconds : 0;
+          return bt - at;
         });
         render(docs);
       })
