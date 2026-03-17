@@ -332,6 +332,30 @@
       justify-content: flex-end;
     }
 
+    .move-btn {
+      font-size: 0.9rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 700;
+      border: 1.5px solid #dde1ea;
+      color: var(--text-light);
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+      line-height: 1;
+    }
+    .move-btn:hover:not(:disabled) { background: var(--navy); color: var(--white); border-color: var(--navy); }
+    .move-btn:disabled { opacity: 0.2; cursor: default; }
+
+    .ann-row-expiry {
+      font-size: 0.72rem;
+      color: var(--text-light);
+      margin-top: 0.2rem;
+    }
+    .expiry-soon   { color: #c87000; font-weight: 600; }
+    .expiry-passed { color: var(--red); font-weight: 600; }
+
     .toggle-btn {
       font-size: 0.78rem;
       padding: 0.38rem 0.9rem;
@@ -493,6 +517,11 @@
               <option value="false">Hidden — not visible on site</option>
             </select>
           </div>
+          <div class="form-group">
+            <label for="f-expires">Auto-unpublish on (optional)</label>
+            <input type="datetime-local" id="f-expires" />
+            <span class="form-hint">Leave blank to keep published until manually hidden.</span>
+          </div>
         </div>
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" id="save-btn">Save Announcement</button>
@@ -632,6 +661,8 @@ function showToast(msg) {
 // ============================================================
 //  Render announcement list
 // ============================================================
+var _currentList = []; // used by moveUp / moveDown
+
 function renderList() {
   if (!db) return;
   var el   = document.getElementById('ann-list');
@@ -639,7 +670,7 @@ function renderList() {
   el.innerHTML = '<p style="color:var(--text-light);padding:1rem">Loading…</p>';
 
   db.collection('announcements')
-    .orderBy('createdAt', 'desc')
+    .orderBy('order', 'asc')
     .get()
     .then(function (snapshot) {
       var list = [];
@@ -648,9 +679,15 @@ function renderList() {
         d._id = doc.id;
         list.push(d);
       });
+      _currentList = list;
 
-      var active = list.filter(function (a) { return a.active; }).length;
-      meta.textContent = list.length + ' total · ' + active + ' published · ' + (list.length - active) + ' hidden';
+      var now = new Date();
+      var liveCount = list.filter(function (a) {
+        if (!a.active) return false;
+        if (a.expiresAt && new Date(a.expiresAt) < now) return false;
+        return true;
+      }).length;
+      meta.textContent = list.length + ' total · ' + liveCount + ' live on site · ' + (list.length - liveCount) + ' not visible';
 
       if (list.length === 0) {
         el.innerHTML = '<div class="empty-state">' +
@@ -660,12 +697,36 @@ function renderList() {
         return;
       }
 
-      el.innerHTML = list.map(function (ann) {
-        var m = catMeta(ann.category);
-        var statusClass = ann.active ? 'status-active'   : 'status-inactive';
-        var statusLabel = ann.active ? 'Published'       : 'Hidden';
-        var rowClass    = ann.category === 'urgent' ? 'urgent' : (ann.active ? 'active' : 'inactive');
-        var safeId      = esc(ann._id);
+      el.innerHTML = list.map(function (ann, idx) {
+        var m          = catMeta(ann.category);
+        var safeId     = esc(ann._id);
+        var isExpired  = ann.expiresAt && new Date(ann.expiresAt) < now;
+        var soonMs     = 24 * 60 * 60 * 1000;
+        var expiresSoon = ann.expiresAt && !isExpired && (new Date(ann.expiresAt) - now) < soonMs;
+
+        var statusClass, statusLabel;
+        if (isExpired) {
+          statusClass = 'status-inactive'; statusLabel = 'Expired';
+        } else if (ann.active) {
+          statusClass = 'status-active';   statusLabel = 'Published';
+        } else {
+          statusClass = 'status-inactive'; statusLabel = 'Hidden';
+        }
+        var rowClass = ann.category === 'urgent' ? 'urgent'
+          : ((ann.active && !isExpired) ? 'active' : 'inactive');
+
+        var expiryHtml = '';
+        if (ann.expiresAt) {
+          var expDate = new Date(ann.expiresAt);
+          var expStr  = expDate.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+          var expCls  = isExpired ? 'expiry-passed' : (expiresSoon ? 'expiry-soon' : '');
+          expiryHtml  = '<div class="ann-row-expiry ' + expCls + '">' +
+            (isExpired ? 'Expired ' : 'Auto-unpublishes ') + expStr + '</div>';
+        }
+
+        var isFirst = idx === 0;
+        var isLast  = idx === list.length - 1;
+
         return '<div class="ann-row ' + rowClass + '" id="row-' + safeId + '">' +
           '<div class="ann-row-info">' +
             '<div class="ann-row-top">' +
@@ -674,14 +735,17 @@ function renderList() {
               (ann.dateText ? '<span class="ann-row-date">' + esc(ann.dateText) + '</span>' : '') +
             '</div>' +
             '<div class="ann-row-title">' + esc(ann.title) + '</div>' +
-            '<div class="ann-row-body">' + esc(ann.body) + '</div>' +
+            '<div class="ann-row-body">'  + esc(ann.body)  + '</div>' +
+            expiryHtml +
           '</div>' +
           '<div class="ann-row-actions">' +
+            '<button class="move-btn" title="Move up"   onclick="moveUp(\''   + safeId + '\')" ' + (isFirst ? 'disabled' : '') + '>↑</button>' +
+            '<button class="move-btn" title="Move down" onclick="moveDown(\'' + safeId + '\')" ' + (isLast  ? 'disabled' : '') + '>↓</button>' +
             '<button class="toggle-btn ' + (ann.active ? 'hide-btn' : 'show-btn') + '" ' +
               'onclick="toggleActive(\'' + safeId + '\',' + ann.active + ')">' +
               (ann.active ? 'Hide' : 'Publish') +
             '</button>' +
-            '<button class="edit-btn" onclick="editAnn(\'' + safeId + '\')">Edit</button>' +
+            '<button class="edit-btn"   onclick="editAnn(\''   + safeId + '\')">Edit</button>' +
             '<button class="delete-btn" onclick="deleteAnn(\'' + safeId + '\')">Delete</button>' +
           '</div>' +
         '</div>';
@@ -691,6 +755,28 @@ function renderList() {
       el.innerHTML = '<div class="empty-state"><strong style="color:var(--red)">Error loading announcements</strong>' +
         '<p>' + esc(err.message) + '</p></div>';
     });
+}
+
+// ============================================================
+//  Reorder
+// ============================================================
+function moveUp(docId) {
+  var idx = _currentList.findIndex(function (a) { return a._id === docId; });
+  if (idx <= 0) return;
+  swapOrder(_currentList[idx], _currentList[idx - 1]);
+}
+
+function moveDown(docId) {
+  var idx = _currentList.findIndex(function (a) { return a._id === docId; });
+  if (idx < 0 || idx >= _currentList.length - 1) return;
+  swapOrder(_currentList[idx], _currentList[idx + 1]);
+}
+
+function swapOrder(a, b) {
+  var batch = db.batch();
+  batch.update(db.collection('announcements').doc(a._id), { order: b.order });
+  batch.update(db.collection('announcements').doc(b._id), { order: a.order });
+  batch.commit().then(renderList).catch(function (e) { alert('Error: ' + e.message); });
 }
 
 // ============================================================
@@ -706,6 +792,7 @@ function openForm() {
   document.getElementById('f-link').value     = '';
   document.getElementById('f-linktext').value = '';
   document.getElementById('f-active').value   = 'true';
+  document.getElementById('f-expires').value   = '';
   var fs = document.getElementById('form-section');
   fs.classList.add('open');
   fs.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -730,6 +817,7 @@ function editAnn(docId) {
     document.getElementById('f-link').value     = ann.link     || '';
     document.getElementById('f-linktext').value = ann.linkText || '';
     document.getElementById('f-active').value   = ann.active ? 'true' : 'false';
+    document.getElementById('f-expires').value   = ann.expiresAt || '';
     var fs = document.getElementById('form-section');
     fs.classList.add('open');
     fs.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -749,6 +837,7 @@ function saveAnn(e) {
   saveBtn.disabled    = true;
   saveBtn.textContent = 'Saving…';
 
+  var expiresVal = document.getElementById('f-expires').value;
   var data = {
     title:     document.getElementById('f-title').value.trim(),
     body:      document.getElementById('f-body').value.trim(),
@@ -757,17 +846,23 @@ function saveAnn(e) {
     link:      document.getElementById('f-link').value.trim(),
     linkText:  document.getElementById('f-linktext').value.trim(),
     active:    document.getElementById('f-active').value === 'true',
+    expiresAt: expiresVal || null,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
   var op;
   if (docId) {
-    // Edit — preserve original createdAt
+    // Edit — preserve original createdAt and order
     op = db.collection('announcements').doc(docId).update(data);
   } else {
-    // New — set createdAt
+    // New — set createdAt and place at top of list (order = minOrder - 1)
     data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-    op = db.collection('announcements').add(data);
+    op = db.collection('announcements')
+      .orderBy('order', 'asc').limit(1).get()
+      .then(function (snap) {
+        data.order = snap.empty ? 0 : (snap.docs[0].data().order - 1);
+        return db.collection('announcements').add(data);
+      });
   }
 
   op.then(function () {

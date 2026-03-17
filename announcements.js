@@ -39,7 +39,12 @@
     var section   = document.getElementById('announcements-section');
     if (!container || !section) return;
 
-    var active = docs.filter(function (a) { return a.active; });
+    var now = new Date();
+    var active = docs.filter(function (a) {
+      if (!a.active) return false;
+      if (a.expiresAt && new Date(a.expiresAt) < now) return false;
+      return true;
+    });
 
     if (active.length === 0) {
       section.style.display = 'none';
@@ -73,7 +78,7 @@
 
   function load() {
     db.collection('announcements')
-      .orderBy('createdAt', 'desc')
+      .orderBy('order', 'asc')
       .get()
       .then(function (snapshot) {
         var docs = [];
