@@ -7,6 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -29,7 +34,7 @@
       min-height: 100vh;
     }
 
-    /* ---- PASSWORD GATE ---- */
+    /* ---- SIGN-IN GATE ---- */
     #gate {
       min-height: 100vh;
       display: flex;
@@ -42,7 +47,7 @@
       border-radius: 16px;
       padding: 3rem 2.5rem;
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       text-align: center;
       box-shadow: 0 24px 64px rgba(0,0,0,0.4);
     }
@@ -67,6 +72,15 @@
       font-size: 1.3rem;
       margin-bottom: 1.5rem;
     }
+    .gate-field { margin-bottom: 1rem; text-align: left; }
+    .gate-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.03em;
+    }
     .gate-box input {
       width: 100%;
       padding: 0.8rem 1rem;
@@ -76,7 +90,6 @@
       font-family: 'Inter', sans-serif;
       color: var(--text);
       outline: none;
-      margin-bottom: 1rem;
       transition: border-color 0.2s;
     }
     .gate-box input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.15); }
@@ -85,7 +98,22 @@
       font-size: 0.85rem;
       margin-bottom: 0.75rem;
       min-height: 1.2em;
+      text-align: center;
     }
+    .setup-notice {
+      background: #fff8e6;
+      border: 1.5px solid var(--gold);
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.82rem;
+      color: #6b5200;
+      text-align: left;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+    .setup-notice strong { display: block; margin-bottom: 0.25rem; color: var(--navy); }
+
+    /* ---- BUTTONS ---- */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -102,10 +130,9 @@
     }
     .btn-primary { background: var(--gold); color: var(--navy-dark); border-color: var(--gold); }
     .btn-primary:hover { background: var(--gold-light); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-secondary { background: transparent; color: var(--navy); border-color: var(--navy); }
     .btn-secondary:hover { background: var(--navy); color: var(--white); }
-    .btn-danger { background: transparent; color: var(--red); border-color: var(--red); font-size: 0.8rem; padding: 0.4rem 0.9rem; }
-    .btn-danger:hover { background: var(--red); color: var(--white); }
     .btn-sm { font-size: 0.8rem; padding: 0.4rem 0.9rem; }
     .btn-full { width: 100%; justify-content: center; }
 
@@ -137,6 +164,10 @@
       text-transform: uppercase;
       color: var(--gold);
       font-weight: 600;
+    }
+    .admin-header-user {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.5);
     }
     .admin-header-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
     .admin-header a { color: rgba(255,255,255,0.6); font-size: 0.82rem; text-decoration: none; transition: color 0.2s; }
@@ -194,6 +225,11 @@
       box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
     }
     .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 0.15rem;
+    }
     .form-actions {
       display: flex;
       gap: 0.75rem;
@@ -232,9 +268,9 @@
       transition: box-shadow 0.2s;
     }
     .ann-row:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); }
-    .ann-row.active { border-left-color: var(--gold); }
+    .ann-row.active   { border-left-color: var(--gold); }
     .ann-row.inactive { border-left-color: #dde1ea; opacity: 0.65; }
-    .ann-row.urgent { border-left-color: var(--red); }
+    .ann-row.urgent   { border-left-color: var(--red); }
 
     .ann-row-info { min-width: 0; }
     .ann-row-top {
@@ -252,7 +288,7 @@
       padding: 0.2rem 0.65rem;
       border-radius: 50px;
     }
-    .ann-badge--navy   { background: rgba(26,39,68,0.1);  color: var(--navy); }
+    .ann-badge--navy   { background: rgba(26,39,68,0.1);   color: var(--navy); }
     .ann-badge--gold   { background: rgba(201,168,76,0.15); color: #8a6e20; }
     .ann-badge--urgent { background: rgba(192,57,43,0.12);  color: var(--red); }
 
@@ -288,7 +324,6 @@
       font-size: 0.75rem;
       color: var(--text-light);
     }
-
     .ann-row-actions {
       display: flex;
       gap: 0.5rem;
@@ -349,31 +384,6 @@
     }
     .empty-state p { margin-top: 0.5rem; font-size: 0.9rem; }
 
-    /* ---- IMPORT/EXPORT ---- */
-    .io-section {
-      margin-top: 2.5rem;
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 1.5rem 2rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-    .io-section h3 {
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-light);
-      margin-bottom: 1rem;
-      border-bottom: 1px solid var(--cream);
-      padding-bottom: 0.5rem;
-    }
-    .io-row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
-    .io-row input[type="file"] {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.85rem;
-      color: var(--text);
-    }
-
     /* ---- RESPONSIVE ---- */
     @media (max-width: 640px) {
       .form-grid { grid-template-columns: 1fr; }
@@ -387,17 +397,32 @@
 <body>
 
 <!-- ============================================================
-     PASSWORD GATE
-     To change the password: edit ADMIN_PASSWORD below.
+     SIGN-IN GATE — powered by Firebase Authentication
+     To manage admin accounts, go to:
+     Firebase Console → Authentication → Users
      ============================================================ -->
 <div id="gate">
   <div class="gate-box">
     <div class="gate-logo">New Light MBC</div>
     <div class="gate-sub">Admin Portal</div>
     <h2>Sign In to Continue</h2>
-    <input type="password" id="pw-input" placeholder="Enter admin password" autocomplete="current-password" />
+
+    <div class="setup-notice" id="setup-notice" style="display:none">
+      <strong>Firebase not configured yet</strong>
+      Open <code>firebase-config.js</code> and fill in your project values.
+      See the comments in that file for step-by-step instructions.
+    </div>
+
+    <div class="gate-field">
+      <label for="pw-input-email">Email</label>
+      <input type="email" id="pw-input-email" placeholder="admin@nlmbc.com" autocomplete="email" />
+    </div>
+    <div class="gate-field">
+      <label for="pw-input">Password</label>
+      <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password" />
+    </div>
     <div class="gate-error" id="pw-error"></div>
-    <button class="btn btn-primary btn-full" onclick="login()">Sign In</button>
+    <button class="btn btn-primary btn-full" id="signin-btn" onclick="login()">Sign In</button>
     <p style="margin-top:1.5rem; font-size:0.78rem; color:var(--text-light)">
       <a href="index.html" style="color:var(--gold)">← Back to site</a>
     </p>
@@ -415,6 +440,7 @@
       <span>Announcements Admin</span>
     </div>
     <div class="admin-header-actions">
+      <span class="admin-header-user" id="admin-user-email"></span>
       <a href="index.html" target="_blank">View Site ↗</a>
       <button class="btn btn-primary btn-sm" onclick="openForm()">+ Add Announcement</button>
       <button class="btn btn-sm" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2)" onclick="logout()">Sign Out</button>
@@ -448,8 +474,9 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="f-date">Date</label>
-            <input type="date" id="f-date" />
+            <label for="f-date">Date / Time Label</label>
+            <input type="text" id="f-date" placeholder="e.g. Mid-June, March 15, Every Sunday" />
+            <span class="form-hint">Type any date or time description — shown exactly as written on the site.</span>
           </div>
           <div class="form-group">
             <label for="f-link">Button Link (optional)</label>
@@ -468,7 +495,7 @@
           </div>
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Save Announcement</button>
+          <button type="submit" class="btn btn-primary" id="save-btn">Save Announcement</button>
           <button type="button" class="btn btn-secondary" onclick="closeForm()">Cancel</button>
         </div>
       </form>
@@ -484,258 +511,107 @@
 
     <div class="ann-list" id="ann-list"></div>
 
-    <!-- IMPORT / EXPORT -->
-    <div class="io-section">
-      <h3>Backup &amp; Restore</h3>
-      <div class="io-row">
-        <button class="btn btn-secondary btn-sm" onclick="exportJSON()">⬇ Export JSON</button>
-        <label class="btn btn-secondary btn-sm" style="cursor:pointer">
-          ⬆ Import JSON
-          <input type="file" accept=".json" style="display:none" onchange="importJSON(event)" />
-        </label>
-        <span style="font-size:0.78rem; color:var(--text-light)">Use Export/Import to back up or transfer announcements between devices.</span>
-      </div>
-    </div>
-
   </div><!-- /admin-body -->
 </div><!-- /admin -->
 
 <script>
 // ============================================================
-//  Configuration — change the password here
+//  Firebase initialization
 // ============================================================
-const ADMIN_PASSWORD = 'nlmbc2025';
-const ANN_KEY        = 'nlmbc_announcements';
-const AUTH_KEY       = 'nlmbc_admin_auth';
+var _firebaseReady = false;
+var auth, db;
 
-// ---- Data helpers ----
-const DEFAULT_ANNOUNCEMENTS = [
-  {
-    id: 1,
-    title: 'Welcome to New Light Missionary Baptist Church',
-    body: 'We are so glad you are here. Whether joining us in person or online, you are warmly welcomed. Stop by the Welcome Center after service — we would love to meet you!',
-    date: today(),
-    category: 'general',
-    link: 'new-visitor.html',
-    linkText: 'Plan Your Visit',
-    active: true
-  },
-  {
-    id: 2,
-    title: 'MidWeek Manna — Wednesday Bible Study',
-    body: 'Join us every Wednesday at 12:00 PM and 7:00 PM for MidWeek Manna worship and Bible Study in the Sanctuary. All are welcome.',
-    date: today(),
-    category: 'worship',
-    link: 'services.html',
-    linkText: 'Service Details',
-    active: true
-  }
-];
-
-function today() { return new Date().toISOString().slice(0, 10); }
-
-function getAll() {
+if (window.NLMBC_FIREBASE_CONFIG &&
+    window.NLMBC_FIREBASE_CONFIG.apiKey.indexOf('REPLACE_') !== 0) {
   try {
-    const s = localStorage.getItem(ANN_KEY);
-    if (s) return JSON.parse(s);
-  } catch(e) {}
-  return DEFAULT_ANNOUNCEMENTS;
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.NLMBC_FIREBASE_CONFIG);
+    }
+    auth = firebase.auth();
+    db   = firebase.firestore();
+    _firebaseReady = true;
+  } catch (e) {
+    console.error('Firebase init failed:', e);
+  }
 }
-function setAll(list) { localStorage.setItem(ANN_KEY, JSON.stringify(list)); }
 
-// ---- Category labels ----
-const CAT_META = {
+if (!_firebaseReady) {
+  // Config not filled in yet — show setup notice, disable sign-in
+  document.getElementById('setup-notice').style.display = 'block';
+  document.getElementById('signin-btn').disabled = true;
+  document.getElementById('pw-input-email').disabled = true;
+  document.getElementById('pw-input').disabled = true;
+} else {
+  // Watch auth state — this fires immediately on page load
+  auth.onAuthStateChanged(function (user) {
+    if (user) {
+      document.getElementById('gate').style.display  = 'none';
+      document.getElementById('admin').style.display = 'block';
+      document.getElementById('admin-user-email').textContent = user.email;
+      renderList();
+    } else {
+      document.getElementById('gate').style.display  = '';
+      document.getElementById('admin').style.display = 'none';
+    }
+  });
+
+  // Enter key submits sign-in
+  document.getElementById('pw-input').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') login();
+  });
+  document.getElementById('pw-input-email').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('pw-input').focus();
+  });
+}
+
+// ============================================================
+//  Auth
+// ============================================================
+function login() {
+  var email = document.getElementById('pw-input-email').value.trim();
+  var pw    = document.getElementById('pw-input').value;
+  var btn   = document.getElementById('signin-btn');
+  document.getElementById('pw-error').textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  auth.signInWithEmailAndPassword(email, pw)
+    .catch(function (err) {
+      document.getElementById('pw-error').textContent =
+        'Incorrect email or password. Please try again.';
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+    })
+    .finally(function () {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    });
+}
+
+function logout() {
+  auth.signOut();
+}
+
+// ============================================================
+//  Helpers
+// ============================================================
+var CAT_META = {
   general: { label: 'Announcement',   color: 'navy'   },
   event:   { label: 'Upcoming Event', color: 'gold'   },
   urgent:  { label: 'Urgent',         color: 'urgent' },
   worship: { label: 'Worship',        color: 'navy'   },
-  prayer:  { label: 'Prayer',         color: 'navy'   },
+  prayer:  { label: 'Prayer',         color: 'navy'   }
 };
 function catMeta(c) { return CAT_META[c] || CAT_META.general; }
 
-function formatDate(d) {
-  if (!d) return '';
-  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
 function esc(s) {
-  return String(s||'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-// ---- Render list ----
-function renderList() {
-  const list = getAll();
-  const el   = document.getElementById('ann-list');
-  const meta = document.getElementById('list-meta');
-  const active = list.filter(a => a.active).length;
-  meta.textContent = `${list.length} total · ${active} published · ${list.length - active} hidden`;
-
-  if (list.length === 0) {
-    el.innerHTML = `<div class="empty-state">
-      <strong style="font-size:1.1rem;color:var(--navy)">No announcements yet</strong>
-      <p>Click "+ Add Announcement" above to create your first one.</p>
-    </div>`;
-    return;
-  }
-
-  // Sort newest first
-  const sorted = [...list].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-  el.innerHTML = sorted.map(ann => {
-    const m = catMeta(ann.category);
-    const statusClass = ann.active ? 'status-active' : 'status-inactive';
-    const statusLabel = ann.active ? 'Published' : 'Hidden';
-    const rowClass    = ann.category === 'urgent' ? 'urgent' : (ann.active ? 'active' : 'inactive');
-    return `
-      <div class="ann-row ${rowClass}" id="row-${ann.id}">
-        <div class="ann-row-info">
-          <div class="ann-row-top">
-            <span class="ann-badge ann-badge--${m.color}">${m.label}</span>
-            <span class="ann-row-status ${statusClass}">${statusLabel}</span>
-            <span class="ann-row-date">${formatDate(ann.date)}</span>
-          </div>
-          <div class="ann-row-title">${esc(ann.title)}</div>
-          <div class="ann-row-body">${esc(ann.body)}</div>
-        </div>
-        <div class="ann-row-actions">
-          <button class="toggle-btn ${ann.active ? 'hide-btn' : 'show-btn'}"
-            onclick="toggleActive(${ann.id})">
-            ${ann.active ? 'Hide' : 'Publish'}
-          </button>
-          <button class="edit-btn" onclick="editAnn(${ann.id})">Edit</button>
-          <button class="delete-btn" onclick="deleteAnn(${ann.id})">Delete</button>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-// ---- Form ----
-function setTodayDate() {
-  document.getElementById('f-date').value = today();
-}
-
-function openForm() {
-  document.getElementById('form-title').textContent = 'Add New Announcement';
-  document.getElementById('f-id').value      = '';
-  document.getElementById('f-title').value   = '';
-  document.getElementById('f-body').value    = '';
-  document.getElementById('f-category').value = 'general';
-  document.getElementById('f-date').value    = today();
-  document.getElementById('f-link').value    = '';
-  document.getElementById('f-linktext').value = '';
-  document.getElementById('f-active').value  = 'true';
-  const fs = document.getElementById('form-section');
-  fs.classList.add('open');
-  fs.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  document.getElementById('f-title').focus();
-}
-
-function closeForm() {
-  document.getElementById('form-section').classList.remove('open');
-}
-
-function editAnn(id) {
-  const list = getAll();
-  const ann  = list.find(a => a.id === id);
-  if (!ann) return;
-  document.getElementById('form-title').textContent = 'Edit Announcement';
-  document.getElementById('f-id').value       = ann.id;
-  document.getElementById('f-title').value    = ann.title;
-  document.getElementById('f-body').value     = ann.body;
-  document.getElementById('f-category').value = ann.category || 'general';
-  document.getElementById('f-date').value     = ann.date || today();
-  document.getElementById('f-link').value     = ann.link || '';
-  document.getElementById('f-linktext').value = ann.linkText || '';
-  document.getElementById('f-active').value   = ann.active ? 'true' : 'false';
-  const fs = document.getElementById('form-section');
-  fs.classList.add('open');
-  fs.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  document.getElementById('f-title').focus();
-}
-
-function saveAnn(e) {
-  e.preventDefault();
-  const list = getAll();
-  const idVal = document.getElementById('f-id').value;
-  const ann = {
-    id:       idVal ? parseInt(idVal) : Date.now(),
-    title:    document.getElementById('f-title').value.trim(),
-    body:     document.getElementById('f-body').value.trim(),
-    category: document.getElementById('f-category').value,
-    date:     document.getElementById('f-date').value || today(),
-    link:     document.getElementById('f-link').value.trim(),
-    linkText: document.getElementById('f-linktext').value.trim(),
-    active:   document.getElementById('f-active').value === 'true',
-  };
-  if (idVal) {
-    const idx = list.findIndex(a => a.id === ann.id);
-    if (idx > -1) list[idx] = ann; else list.push(ann);
-  } else {
-    list.push(ann);
-  }
-  setAll(list);
-  closeForm();
-  renderList();
-  // Flash confirmation
-  showToast(idVal ? 'Announcement updated.' : 'Announcement added!');
-}
-
-// ---- Toggle / Delete ----
-function toggleActive(id) {
-  const list = getAll();
-  const ann  = list.find(a => a.id === id);
-  if (!ann) return;
-  ann.active = !ann.active;
-  setAll(list);
-  renderList();
-  showToast(ann.active ? 'Announcement published.' : 'Announcement hidden.');
-}
-
-function deleteAnn(id) {
-  if (!confirm('Delete this announcement? This cannot be undone.')) return;
-  const list = getAll().filter(a => a.id !== id);
-  setAll(list);
-  renderList();
-  showToast('Announcement deleted.');
-}
-
-// ---- Export / Import ----
-function exportJSON() {
-  const data    = JSON.stringify(getAll(), null, 2);
-  const blob    = new Blob([data], { type: 'application/json' });
-  const url     = URL.createObjectURL(blob);
-  const a       = document.createElement('a');
-  a.href        = url;
-  a.download    = `nlmbc-announcements-${today()}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importJSON(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if (!Array.isArray(data)) throw new Error('Not an array');
-      if (confirm(`Import ${data.length} announcements? This will replace all current announcements.`)) {
-        setAll(data);
-        renderList();
-        showToast(`Imported ${data.length} announcements.`);
-      }
-    } catch(err) {
-      alert('Invalid file. Please export from this admin page and use that file.');
-    }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
-}
-
-// ---- Toast notification ----
 function showToast(msg) {
-  const t = document.createElement('div');
+  var t = document.createElement('div');
   t.textContent = msg;
   Object.assign(t.style, {
     position: 'fixed', bottom: '2rem', right: '2rem', zIndex: '9999',
@@ -747,44 +623,191 @@ function showToast(msg) {
     fontFamily: 'Inter, sans-serif',
   });
   document.body.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2500);
+  setTimeout(function () {
+    t.style.opacity = '0';
+    setTimeout(function () { t.remove(); }, 400);
+  }, 2500);
 }
 
-// ---- Auth functions ----
-function login() {
-  const val = document.getElementById('pw-input').value;
-  if (val === ADMIN_PASSWORD) {
-    sessionStorage.setItem(AUTH_KEY, '1');
-    document.getElementById('gate').style.display  = 'none';
-    document.getElementById('admin').style.display = 'block';
-    renderList();
-    setTodayDate();
+// ============================================================
+//  Render announcement list
+// ============================================================
+function renderList() {
+  if (!db) return;
+  var el   = document.getElementById('ann-list');
+  var meta = document.getElementById('list-meta');
+  el.innerHTML = '<p style="color:var(--text-light);padding:1rem">Loading…</p>';
+
+  db.collection('announcements')
+    .orderBy('createdAt', 'desc')
+    .get()
+    .then(function (snapshot) {
+      var list = [];
+      snapshot.forEach(function (doc) {
+        var d = doc.data();
+        d._id = doc.id;
+        list.push(d);
+      });
+
+      var active = list.filter(function (a) { return a.active; }).length;
+      meta.textContent = list.length + ' total · ' + active + ' published · ' + (list.length - active) + ' hidden';
+
+      if (list.length === 0) {
+        el.innerHTML = '<div class="empty-state">' +
+          '<strong style="font-size:1.1rem;color:var(--navy)">No announcements yet</strong>' +
+          '<p>Click "+ Add Announcement" above to create your first one.</p>' +
+          '</div>';
+        return;
+      }
+
+      el.innerHTML = list.map(function (ann) {
+        var m = catMeta(ann.category);
+        var statusClass = ann.active ? 'status-active'   : 'status-inactive';
+        var statusLabel = ann.active ? 'Published'       : 'Hidden';
+        var rowClass    = ann.category === 'urgent' ? 'urgent' : (ann.active ? 'active' : 'inactive');
+        var safeId      = esc(ann._id);
+        return '<div class="ann-row ' + rowClass + '" id="row-' + safeId + '">' +
+          '<div class="ann-row-info">' +
+            '<div class="ann-row-top">' +
+              '<span class="ann-badge ann-badge--' + m.color + '">' + m.label + '</span>' +
+              '<span class="ann-row-status ' + statusClass + '">' + statusLabel + '</span>' +
+              (ann.dateText ? '<span class="ann-row-date">' + esc(ann.dateText) + '</span>' : '') +
+            '</div>' +
+            '<div class="ann-row-title">' + esc(ann.title) + '</div>' +
+            '<div class="ann-row-body">' + esc(ann.body) + '</div>' +
+          '</div>' +
+          '<div class="ann-row-actions">' +
+            '<button class="toggle-btn ' + (ann.active ? 'hide-btn' : 'show-btn') + '" ' +
+              'onclick="toggleActive(\'' + safeId + '\',' + ann.active + ')">' +
+              (ann.active ? 'Hide' : 'Publish') +
+            '</button>' +
+            '<button class="edit-btn" onclick="editAnn(\'' + safeId + '\')">Edit</button>' +
+            '<button class="delete-btn" onclick="deleteAnn(\'' + safeId + '\')">Delete</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    })
+    .catch(function (err) {
+      el.innerHTML = '<div class="empty-state"><strong style="color:var(--red)">Error loading announcements</strong>' +
+        '<p>' + esc(err.message) + '</p></div>';
+    });
+}
+
+// ============================================================
+//  Form — open / close / populate
+// ============================================================
+function openForm() {
+  document.getElementById('form-title').textContent = 'Add New Announcement';
+  document.getElementById('f-id').value       = '';
+  document.getElementById('f-title').value    = '';
+  document.getElementById('f-body').value     = '';
+  document.getElementById('f-category').value = 'general';
+  document.getElementById('f-date').value     = '';
+  document.getElementById('f-link').value     = '';
+  document.getElementById('f-linktext').value = '';
+  document.getElementById('f-active').value   = 'true';
+  var fs = document.getElementById('form-section');
+  fs.classList.add('open');
+  fs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('f-title').focus();
+}
+
+function closeForm() {
+  document.getElementById('form-section').classList.remove('open');
+}
+
+function editAnn(docId) {
+  if (!db) return;
+  db.collection('announcements').doc(docId).get().then(function (doc) {
+    if (!doc.exists) return;
+    var ann = doc.data();
+    document.getElementById('form-title').textContent = 'Edit Announcement';
+    document.getElementById('f-id').value       = docId;
+    document.getElementById('f-title').value    = ann.title    || '';
+    document.getElementById('f-body').value     = ann.body     || '';
+    document.getElementById('f-category').value = ann.category || 'general';
+    document.getElementById('f-date').value     = ann.dateText || '';
+    document.getElementById('f-link').value     = ann.link     || '';
+    document.getElementById('f-linktext').value = ann.linkText || '';
+    document.getElementById('f-active').value   = ann.active ? 'true' : 'false';
+    var fs = document.getElementById('form-section');
+    fs.classList.add('open');
+    fs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('f-title').focus();
+  });
+}
+
+// ============================================================
+//  Save (create or update)
+// ============================================================
+function saveAnn(e) {
+  e.preventDefault();
+  if (!db) return;
+
+  var docId   = document.getElementById('f-id').value;
+  var saveBtn = document.getElementById('save-btn');
+  saveBtn.disabled    = true;
+  saveBtn.textContent = 'Saving…';
+
+  var data = {
+    title:     document.getElementById('f-title').value.trim(),
+    body:      document.getElementById('f-body').value.trim(),
+    category:  document.getElementById('f-category').value,
+    dateText:  document.getElementById('f-date').value.trim(),
+    link:      document.getElementById('f-link').value.trim(),
+    linkText:  document.getElementById('f-linktext').value.trim(),
+    active:    document.getElementById('f-active').value === 'true',
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  var op;
+  if (docId) {
+    // Edit — preserve original createdAt
+    op = db.collection('announcements').doc(docId).update(data);
   } else {
-    document.getElementById('pw-error').textContent = 'Incorrect password. Please try again.';
-    document.getElementById('pw-input').value = '';
-    document.getElementById('pw-input').focus();
+    // New — set createdAt
+    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+    op = db.collection('announcements').add(data);
   }
+
+  op.then(function () {
+    closeForm();
+    renderList();
+    showToast(docId ? 'Announcement updated.' : 'Announcement added!');
+  })
+  .catch(function (err) {
+    alert('Save failed: ' + err.message);
+  })
+  .finally(function () {
+    saveBtn.disabled    = false;
+    saveBtn.textContent = 'Save Announcement';
+  });
 }
-function logout() {
-  sessionStorage.removeItem(AUTH_KEY);
-  location.reload();
+
+// ============================================================
+//  Toggle / Delete
+// ============================================================
+function toggleActive(docId, currentState) {
+  if (!db) return;
+  db.collection('announcements').doc(docId)
+    .update({ active: !currentState })
+    .then(function () {
+      renderList();
+      showToast(!currentState ? 'Announcement published.' : 'Announcement hidden.');
+    })
+    .catch(function (err) { alert('Error: ' + err.message); });
 }
 
-// ---- Initialization (runs after all declarations above are ready) ----
-// Seed localStorage with defaults if empty
-if (!localStorage.getItem(ANN_KEY)) setAll(DEFAULT_ANNOUNCEMENTS);
-
-// Enter key on password field
-document.getElementById('pw-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') login();
-});
-
-// If already authenticated this session, skip the gate and render immediately
-if (sessionStorage.getItem(AUTH_KEY)) {
-  document.getElementById('gate').style.display  = 'none';
-  document.getElementById('admin').style.display = 'block';
-  renderList();
-  setTodayDate();
+function deleteAnn(docId) {
+  if (!confirm('Delete this announcement? This cannot be undone.')) return;
+  if (!db) return;
+  db.collection('announcements').doc(docId)
+    .delete()
+    .then(function () {
+      renderList();
+      showToast('Announcement deleted.');
+    })
+    .catch(function (err) { alert('Error: ' + err.message); });
 }
 </script>
 </body>
