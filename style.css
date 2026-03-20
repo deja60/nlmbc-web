@@ -1086,6 +1086,7 @@ h3 { font-size: 1.2rem; }
   .nav-links > li { width: 100%; border-bottom: 1px solid rgba(255,255,255,0.08); }
   .nav-links > li > a { display: flex; align-items: center; min-height: 44px; padding: 0.5rem 0; font-size: 1rem; }
   .dropdown { position: static; opacity: 1; pointer-events: all; transform: none; box-shadow: none; border-radius: 0; padding: 0 0 0 1rem; background: transparent; border-top: none; display: none; }
+  .dropdown::before { display: none; }
   .has-dropdown.open .dropdown { display: block; }
   .dropdown li a { padding: 0.5rem 0; color: rgba(255,255,255,0.6); }
 
